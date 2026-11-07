@@ -43,7 +43,7 @@
 
 ## Етап 5. Backend
 
-- [ ] Створити Spring Boot/Maven skeleton на Java 21.
+- [x] Створити Spring Boot/Maven skeleton на Java 25 LTS.
 - [ ] Додати конфігурацію профілів і секретів без hardcode.
 - [ ] Реалізувати ONNX Runtime adapter і model registry.
 - [ ] Реалізувати `POST /api/v1/recognitions` з валідацією.
@@ -54,9 +54,9 @@
 
 ## Етап 6. Frontend/PWA
 
-- [ ] Створити React + TypeScript + Vite skeleton.
-- [ ] Налаштувати Material UI theme та responsive layout.
-- [ ] Реалізувати upload/camera flow і client-side validation.
+- [x] Створити React + TypeScript + Vite skeleton.
+- [x] Налаштувати Material UI theme та responsive layout.
+- [x] Реалізувати upload flow і client-side validation.
 - [ ] Реалізувати result, catalog, tests, history, progress і comparison pages.
 - [ ] Додати auth flow і стани loading/error/empty.
 - [ ] Додати manifest, service worker та installability checks.
@@ -78,4 +78,3 @@
 - [ ] Додати порівняльні таблиці лише з відтворюваними даними.
 - [ ] Підготувати демонстраційний сценарій.
 - [ ] Перевірити ліцензії датасету, бібліотек і ресурсів каталогу.
-

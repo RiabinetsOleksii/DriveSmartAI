@@ -30,7 +30,7 @@ React + TypeScript + Vite + Material UI + PWA tooling.
 
 ### `backend/`
 
-Java 21 + Spring Boot + Maven.
+Java 25 LTS + Spring Boot + Maven.
 
 - **Web/API layer:** REST controllers, DTO, validation, error responses.
 - **Application layer:** use cases розпізнавання, каталогу, тестів, історії та порівняння.
@@ -144,4 +144,3 @@ Response shape:
 ## 7. Версіонування ML-артефактів
 
 Кожна модель має ідентифікатор, commit/config reference, список класів, preprocessing contract, ONNX opset, метрики та checksum. Backend активує тільки повний і перевірений запис registry.
-

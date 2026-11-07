@@ -1,4 +1,4 @@
-# Правила розробки DriveSmartAI
+ # Правила розробки DriveSmartAI
 
 ## Контекст проєкту
 
@@ -17,7 +17,7 @@ DriveSmartAI — PWA для класифікації одного дорожнь
 
 ## Якість коду
 
-- Backend: Java 21, Spring Boot, Maven; розділяти controller, use case/service, repository та infrastructure.
+- Backend: Java 25 LTS, Spring Boot, Maven; розділяти controller, use case/service, repository та infrastructure.
 - Frontend: TypeScript без `any`, React-компоненти з явними станами loading/error/empty, UI через Material UI.
 - ML: Python 3.11, PyTorch; фіксувати seed, конфігурацію, split, preprocessing і class mapping.
 - Повторно використовувати спільні типи/контракти, не дублювати preprocessing і mapping.
@@ -48,4 +48,3 @@ DriveSmartAI — PWA для класифікації одного дорожнь
 - Не видаляти чужі незв’язані зміни та не робити destructive reset/checkout.
 - Оновлювати пов’язані документи разом зі зміною вимог, API або структури.
 - Усі експериментальні висновки мають посилатися на конкретну конфігурацію та артефакти.
-
