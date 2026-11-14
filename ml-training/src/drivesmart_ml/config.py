@@ -8,7 +8,7 @@ from pathlib import Path
 class DataConfig:
     root: Path = Path("..") / "datasets" / "gtsrb"
     image_size: int = 64
-    batch_size: int = 32
+    batch_size: int = 16
     num_workers: int = 0
     seed: int = 42
     validation_fraction: float = 0.2
@@ -28,7 +28,23 @@ class DataConfig:
 class ExperimentConfig:
     num_classes: int = 43
     seed: int = 42
+    epochs: int = 15
+    learning_rate: float = 1e-3
+    weight_decay: float = 1e-4
+    early_stopping_patience: int = 5
+    early_stopping_min_delta: float = 0.0
+    mixed_precision: bool = True
 
     def __post_init__(self) -> None:
         if self.num_classes != 43:
             raise ValueError("GTSRB must contain exactly 43 classes")
+        if self.epochs <= 0:
+            raise ValueError("epochs must be positive")
+        if self.learning_rate <= 0:
+            raise ValueError("learning_rate must be positive")
+        if self.weight_decay < 0:
+            raise ValueError("weight_decay cannot be negative")
+        if self.early_stopping_patience < 0:
+            raise ValueError("early_stopping_patience cannot be negative")
+        if self.early_stopping_min_delta < 0:
+            raise ValueError("early_stopping_min_delta cannot be negative")

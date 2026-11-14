@@ -9,9 +9,11 @@ import pandas as pd
 
 from .audit import audit_image_tree, class_counts
 from .config import DataConfig
-from .data import make_gtsrb_loaders
+from .data import load_gtsrb, make_gtsrb_loaders
 from .mapping import validate_class_mapping
 from .split import records_from_training_tree, split_records, write_split_manifest
+from .config import ExperimentConfig
+from .training import train
 
 
 def download_dataset(root: Path) -> None:
@@ -81,6 +83,15 @@ def main() -> None:
     split.add_argument("--output", type=Path, default=Path("outputs") / "split.csv")
     split.add_argument("--validation-fraction", type=float, default=0.2)
     split.add_argument("--seed", type=int, default=42)
+    train_parser = subparsers.add_parser("train")
+    train_parser.add_argument("--root", type=Path, default=Path("..") / "datasets" / "gtsrb")
+    train_parser.add_argument("--split-manifest", type=Path, default=Path("outputs") / "split.csv")
+    train_parser.add_argument("--output", type=Path, default=Path("outputs") / "custom-cnn")
+    train_parser.add_argument("--batch-size", type=int, default=16)
+    train_parser.add_argument("--epochs", type=int, default=15)
+    train_parser.add_argument("--num-workers", type=int, default=0)
+    train_parser.add_argument("--seed", type=int, default=42)
+    train_parser.add_argument("--patience", type=int, default=5)
     args = parser.parse_args()
     validate_class_mapping()
     if args.command == "download":
@@ -89,8 +100,21 @@ def main() -> None:
         audit_dataset(args.root, args.output)
     elif args.command == "smoke":
         smoke_check(args.root, args.split_manifest, args.image_size, args.batch_size, args.num_workers)
-    else:
+    elif args.command == "split":
         create_split(args.root, args.output, args.validation_fraction, args.seed)
+    else:
+        history, device = train(
+            DataConfig(root=args.root, batch_size=args.batch_size, num_workers=args.num_workers, seed=args.seed),
+            ExperimentConfig(epochs=args.epochs, seed=args.seed, early_stopping_patience=args.patience),
+            args.split_manifest,
+            args.output,
+        )
+        last = history[-1]
+        print(
+            f"Training complete on {device}: epochs={len(history)}, "
+            f"validation_accuracy={last.validation_accuracy:.4f}, "
+            f"validation_macro_f1={last.validation_macro_f1:.4f}"
+        )
 
 
 if __name__ == "__main__":

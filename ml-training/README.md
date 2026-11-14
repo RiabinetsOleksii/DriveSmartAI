@@ -1,7 +1,7 @@
 # DriveSmartAI ML preparation
 
-Цей модуль готує GTSRB для майбутнього навчання власної CNN і MobileNetV3.
-Навчання моделей, ONNX та числові результати свідомо не входять до цього етапу.
+Цей модуль готує GTSRB і навчає першу власну CNN; офіційний test набір
+залишається зарезервованим для фінального оцінювання.
 Датасет і згенеровані звіти зберігаються локально та ігноруються Git.
 
 ## Windows PowerShell
@@ -45,6 +45,16 @@ python -m drivesmart_ml.cli split --root ..\datasets\gtsrb --output outputs\spli
 ```powershell
 python -m pytest
 ```
+
+Навчання власної CNN (за замовчуванням 15 епох, CUDA з CPU fallback,
+batch size 16, mixed precision на CUDA):
+
+```powershell
+python -m drivesmart_ml.cli train --root ..\datasets\gtsrb --split-manifest outputs\split.csv --output outputs\custom-cnn --epochs 15 --batch-size 16 --seed 42
+```
+
+Для пробного запуску використовуйте `--epochs 1`. У вихідній папці створюються
+`best_cnn.pth`, `history.csv`, `training_curves.png` і `config.json`.
 
 ## Контракти та структура
 
