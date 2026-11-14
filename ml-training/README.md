@@ -56,6 +56,18 @@ python -m drivesmart_ml.cli train --root ..\datasets\gtsrb --split-manifest outp
 Для пробного запуску використовуйте `--epochs 1`. У вихідній папці створюються
 `best_cnn.pth`, `history.csv`, `training_curves.png` і `config.json`.
 
+Навчання MobileNetV3-Small із ImageNet transfer learning виконується окремо:
+
+```powershell
+python -m drivesmart_ml.cli train-mobilenet --root ..\datasets\gtsrb --split-manifest outputs\split.csv --output outputs\mobilenetv3 --epochs 15 --classifier-epochs 2 --fine-tune-blocks 3 --batch-size 16 --seed 42
+```
+
+Перші `classifier-epochs` епох навчають лише classifier, після чого
+розморожуються останні `fine-tune-blocks` блоки backbone. Результати MobileNet
+зберігаються окремо: `best_mobilenetv3.pth`, `history.csv`,
+`training_curves.png` та `config.json`. Для проби використовуйте
+`--epochs 1 --classifier-epochs 0`.
+
 ## Контракти та структура
 
 - `src/drivesmart_ml/config.py` — типізована конфігурація та перевірки.

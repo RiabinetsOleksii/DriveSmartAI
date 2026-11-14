@@ -8,11 +8,11 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 from .audit import audit_image_tree, class_counts
-from .config import DataConfig
+from .config import DataConfig, ExperimentConfig
 from .data import load_gtsrb, make_gtsrb_loaders
 from .mapping import validate_class_mapping
 from .split import records_from_training_tree, split_records, write_split_manifest
-from .config import ExperimentConfig
+from .mobilenet_training import train_mobilenet
 from .training import train
 
 
@@ -92,6 +92,18 @@ def main() -> None:
     train_parser.add_argument("--num-workers", type=int, default=0)
     train_parser.add_argument("--seed", type=int, default=42)
     train_parser.add_argument("--patience", type=int, default=5)
+    mobilenet_parser = subparsers.add_parser("train-mobilenet")
+    mobilenet_parser.add_argument("--root", type=Path, default=Path("..") / "datasets" / "gtsrb")
+    mobilenet_parser.add_argument("--split-manifest", type=Path, default=Path("outputs") / "split.csv")
+    mobilenet_parser.add_argument("--output", type=Path, default=Path("outputs") / "mobilenetv3")
+    mobilenet_parser.add_argument("--batch-size", type=int, default=16)
+    mobilenet_parser.add_argument("--epochs", type=int, default=15)
+    mobilenet_parser.add_argument("--classifier-epochs", type=int, default=2)
+    mobilenet_parser.add_argument("--fine-tune-blocks", type=int, default=3)
+    mobilenet_parser.add_argument("--fine-tune-learning-rate", type=float, default=1e-4)
+    mobilenet_parser.add_argument("--num-workers", type=int, default=0)
+    mobilenet_parser.add_argument("--seed", type=int, default=42)
+    mobilenet_parser.add_argument("--patience", type=int, default=5)
     args = parser.parse_args()
     validate_class_mapping()
     if args.command == "download":
@@ -102,7 +114,7 @@ def main() -> None:
         smoke_check(args.root, args.split_manifest, args.image_size, args.batch_size, args.num_workers)
     elif args.command == "split":
         create_split(args.root, args.output, args.validation_fraction, args.seed)
-    else:
+    elif args.command == "train":
         history, device = train(
             DataConfig(root=args.root, batch_size=args.batch_size, num_workers=args.num_workers, seed=args.seed),
             ExperimentConfig(epochs=args.epochs, seed=args.seed, early_stopping_patience=args.patience),
@@ -112,6 +124,23 @@ def main() -> None:
         last = history[-1]
         print(
             f"Training complete on {device}: epochs={len(history)}, "
+            f"validation_accuracy={last.validation_accuracy:.4f}, "
+            f"validation_macro_f1={last.validation_macro_f1:.4f}"
+        )
+    else:
+        history, device, model = train_mobilenet(
+            DataConfig(root=args.root, batch_size=args.batch_size, num_workers=args.num_workers, seed=args.seed),
+            ExperimentConfig(epochs=args.epochs, seed=args.seed, early_stopping_patience=args.patience),
+            args.split_manifest,
+            args.output,
+            classifier_epochs=args.classifier_epochs,
+            fine_tune_blocks=args.fine_tune_blocks,
+            fine_tune_learning_rate=args.fine_tune_learning_rate,
+        )
+        last = history[-1]
+        print(
+            f"MobileNetV3 training complete on {device}: epochs={len(history)}, "
+            f"parameters={sum(parameter.numel() for parameter in model.parameters())}, "
             f"validation_accuracy={last.validation_accuracy:.4f}, "
             f"validation_macro_f1={last.validation_macro_f1:.4f}"
         )
