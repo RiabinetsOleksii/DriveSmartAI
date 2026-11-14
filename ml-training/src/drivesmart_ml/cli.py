@@ -14,6 +14,7 @@ from .mapping import validate_class_mapping
 from .split import records_from_training_tree, split_records, write_split_manifest
 from .mobilenet_training import train_mobilenet
 from .training import train
+from .evaluation import evaluate_models
 
 
 def download_dataset(root: Path) -> None:
@@ -105,6 +106,18 @@ def main() -> None:
     mobilenet_parser.add_argument("--num-workers", type=int, default=0)
     mobilenet_parser.add_argument("--seed", type=int, default=42)
     mobilenet_parser.add_argument("--patience", type=int, default=5)
+    evaluate_parser = subparsers.add_parser("evaluate-models")
+    evaluate_parser.add_argument("--root", type=Path, default=Path("..") / "datasets" / "gtsrb")
+    evaluate_parser.add_argument("--custom-checkpoint", type=Path, default=Path("outputs") / "custom-cnn" / "best_cnn.pth")
+    evaluate_parser.add_argument(
+        "--mobilenet-checkpoint",
+        type=Path,
+        default=Path("outputs") / "mobilenetv3-128-full" / "best_mobilenetv3.pth",
+    )
+    evaluate_parser.add_argument("--output", type=Path, default=Path("outputs") / "evaluation")
+    evaluate_parser.add_argument("--batch-size", type=int, default=8)
+    evaluate_parser.add_argument("--num-workers", type=int, default=0)
+    evaluate_parser.add_argument("--warmup-batches", type=int, default=2)
     args = parser.parse_args()
     validate_class_mapping()
     if args.command == "download":
@@ -128,7 +141,7 @@ def main() -> None:
             f"validation_accuracy={last.validation_accuracy:.4f}, "
             f"validation_macro_f1={last.validation_macro_f1:.4f}"
         )
-    else:
+    elif args.command == "train-mobilenet":
         history, device, model = train_mobilenet(
             DataConfig(
                 root=args.root,
@@ -151,6 +164,22 @@ def main() -> None:
             f"validation_accuracy={last.validation_accuracy:.4f}, "
             f"validation_macro_f1={last.validation_macro_f1:.4f}"
         )
+    else:
+        result = evaluate_models(
+            args.root,
+            args.custom_checkpoint,
+            args.mobilenet_checkpoint,
+            args.output,
+            args.batch_size,
+            args.num_workers,
+            args.warmup_batches,
+        )
+        for metrics in result["results"]:
+            print(
+                f"{metrics['model']}: accuracy={metrics['accuracy']:.4f}, "
+                f"macro_f1={metrics['macro_f1']:.4f}, "
+                f"ms_per_image={metrics['inference_ms_per_image']:.4f}"
+            )
 
 
 if __name__ == "__main__":

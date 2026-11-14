@@ -80,3 +80,12 @@ python -m drivesmart_ml.cli train-mobilenet --root ..\datasets\gtsrb --split-man
 
 Офіційний test набір не використовується для train/validation split і має бути
 зарезервований для фінального оцінювання після реалізації моделей.
+
+Фінальне незалежне оцінювання двох checkpoint-ів на офіційному GTSRB test:
+
+```powershell
+python -m drivesmart_ml.cli evaluate-models --root ..\datasets\gtsrb --custom-checkpoint outputs\custom-cnn\best_cnn.pth --mobilenet-checkpoint outputs\mobilenetv3-128-full\best_mobilenetv3.pth --output outputs\evaluation --batch-size 8
+```
+
+Команда створює aggregate/per-class metrics, CSV/JSON comparison,
+confusion matrix CSV/PNG і вимірювання GPU inference latency.
