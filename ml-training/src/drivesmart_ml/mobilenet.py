@@ -17,6 +17,7 @@ class MobileNetV3Small(nn.Module):
             raise ValueError("num_classes must be positive")
         weights = MobileNet_V3_Small_Weights.DEFAULT if pretrained else None
         self.network = mobilenet_v3_small(weights=weights)
+        self._backbone_fully_frozen = False
         classifier = self.network.classifier
         if dropout is not None:
             classifier[0] = nn.Dropout(p=dropout)
@@ -33,11 +34,29 @@ class MobileNetV3Small(nn.Module):
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         return self.network(inputs)
 
+    def train(self, mode: bool = True) -> "MobileNetV3Small":
+        super().train(mode)
+        if mode and self._backbone_fully_frozen:
+            self.features.eval()
+        elif mode:
+            self._set_frozen_batchnorm_eval()
+        return self
+
+    def _set_frozen_batchnorm_eval(self) -> None:
+        for module in self.features.modules():
+            if isinstance(module, nn.modules.batchnorm._BatchNorm) and all(
+                not parameter.requires_grad for parameter in module.parameters()
+            ):
+                module.eval()
+
     def freeze_backbone(self) -> None:
         for parameter in self.features.parameters():
             parameter.requires_grad = False
         for parameter in self.classifier.parameters():
             parameter.requires_grad = True
+        self._backbone_fully_frozen = True
+        if self.training:
+            self.features.eval()
 
     def unfreeze_last_blocks(self, block_count: int = 3) -> None:
         if not 0 < block_count <= len(self.features):
@@ -46,6 +65,9 @@ class MobileNetV3Small(nn.Module):
         for block in list(self.features.children())[-block_count:]:
             for parameter in block.parameters():
                 parameter.requires_grad = True
+        self._backbone_fully_frozen = False
+        if self.training:
+            self._set_frozen_batchnorm_eval()
 
     def trainable_parameter_count(self) -> int:
         return sum(parameter.numel() for parameter in self.parameters() if parameter.requires_grad)

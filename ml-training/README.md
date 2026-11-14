@@ -59,7 +59,7 @@ python -m drivesmart_ml.cli train --root ..\datasets\gtsrb --split-manifest outp
 Навчання MobileNetV3-Small із ImageNet transfer learning виконується окремо:
 
 ```powershell
-python -m drivesmart_ml.cli train-mobilenet --root ..\datasets\gtsrb --split-manifest outputs\split.csv --output outputs\mobilenetv3 --epochs 15 --classifier-epochs 2 --fine-tune-blocks 3 --batch-size 16 --seed 42
+python -m drivesmart_ml.cli train-mobilenet --root ..\datasets\gtsrb --split-manifest outputs\split.csv --output outputs\mobilenetv3 --image-size 64 --epochs 15 --classifier-epochs 2 --fine-tune-blocks 3 --batch-size 16 --seed 42
 ```
 
 Перші `classifier-epochs` епох навчають лише classifier, після чого

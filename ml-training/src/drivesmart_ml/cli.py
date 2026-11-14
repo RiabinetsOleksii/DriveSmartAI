@@ -96,6 +96,7 @@ def main() -> None:
     mobilenet_parser.add_argument("--root", type=Path, default=Path("..") / "datasets" / "gtsrb")
     mobilenet_parser.add_argument("--split-manifest", type=Path, default=Path("outputs") / "split.csv")
     mobilenet_parser.add_argument("--output", type=Path, default=Path("outputs") / "mobilenetv3")
+    mobilenet_parser.add_argument("--image-size", type=int, default=64)
     mobilenet_parser.add_argument("--batch-size", type=int, default=16)
     mobilenet_parser.add_argument("--epochs", type=int, default=15)
     mobilenet_parser.add_argument("--classifier-epochs", type=int, default=2)
@@ -129,7 +130,13 @@ def main() -> None:
         )
     else:
         history, device, model = train_mobilenet(
-            DataConfig(root=args.root, batch_size=args.batch_size, num_workers=args.num_workers, seed=args.seed),
+            DataConfig(
+                root=args.root,
+                image_size=args.image_size,
+                batch_size=args.batch_size,
+                num_workers=args.num_workers,
+                seed=args.seed,
+            ),
             ExperimentConfig(epochs=args.epochs, seed=args.seed, early_stopping_patience=args.patience),
             args.split_manifest,
             args.output,
