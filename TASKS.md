@@ -11,11 +11,11 @@
 
 ## Етап 1. Підготовка даних
 
-- [ ] Додати reproducible спосіб отримання GTSRB без коміту датасету.
-- [ ] Перевірити структуру, пошкоджені файли та розподіл 43 класів.
-- [ ] Зафіксувати train/validation/test split.
-- [ ] Реалізувати спільний preprocessing і class mapping.
-- [ ] Додати тести відсутності data leakage.
+- [x] Додати reproducible спосіб отримання GTSRB без коміту датасету.
+- [-] Перевірити структуру, пошкоджені файли та розподіл 43 класів.
+- [-] Зафіксувати train/validation/test split.
+- [x] Реалізувати спільний preprocessing і class mapping.
+- [x] Додати тести відсутності data leakage.
 
 ## Етап 2. Власна CNN
 
@@ -43,7 +43,7 @@
 
 ## Етап 5. Backend
 
-- [x] Створити Spring Boot/Maven skeleton на Java 25 LTS.
+- [x] Створити Spring Boot/Maven skeleton на Java 21 LTS.
 - [ ] Додати конфігурацію профілів і секретів без hardcode.
 - [ ] Реалізувати ONNX Runtime adapter і model registry.
 - [ ] Реалізувати `POST /api/v1/recognitions` з валідацією.

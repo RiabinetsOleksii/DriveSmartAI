@@ -15,7 +15,7 @@ DriveSmartAI — кросплатформений PWA-застосунок дл�
 
 | Частина | Технології |
 |---|---|
-| Backend | Java 25 LTS, Spring Boot, Maven, ONNX Runtime Java |
+| Backend | Java 21 LTS, Spring Boot, Maven, ONNX Runtime Java |
 | Frontend | React, TypeScript, Vite, Material UI, PWA |
 | ML | Python 3.11, PyTorch |
 | Дані | GTSRB |
@@ -39,11 +39,11 @@ YOLO, відео та детекція кількох знаків не вход
 
 ```text
 .
-├── backend/       # Майбутній Spring Boot backend
+├── backend/       # Spring Boot backend (GET /api/health)
 ├── datasets/      # Локальні дані; не комітяться
 ├── docs/          # Деталі експериментів та технічні матеріали
-├── frontend/      # Майбутній React PWA
-├── ml-training/   # Майбутні PyTorch training/evaluation scripts
+├── frontend/      # React + TypeScript frontend skeleton
+├── ml-training/   # PyTorch data preparation and future training scripts
 ├── AGENTS.md
 ├── ARCHITECTURE.md
 ├── PROJECT_SPEC.md
@@ -54,9 +54,9 @@ YOLO, відео та детекція кількох знаків не вход
 
 ## Поточний стан
 
-Репозиторій перебуває на початковому етапі реалізації. Створено базову структуру каталогів, документацію та мінімальний Spring Boot backend із `GET /api/health`. Frontend, ML-код, MySQL, OAuth і результати експериментів ще не створювалися.
+Реалізовано мінімальний Spring Boot backend із `GET /api/health`, React + TypeScript frontend skeleton із health API integration та ML-модуль підготовки даних GTSRB. MySQL, OAuth, навчання моделей, ONNX і результати експериментів ще не реалізовані.
 
-Наступні кроки — узгодити preprocessing contract, спосіб відтворюваного отримання GTSRB та формат версій ML-моделей, після чого перейти до підготовки даних і розширення backend API.
+Наступний крок — локально завантажити GTSRB, виконати аудит і smoke-check DataLoader, після чого перейти до навчання власної CNN.
 
 ## Документація
 

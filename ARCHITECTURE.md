@@ -30,7 +30,7 @@ React + TypeScript + Vite + Material UI + PWA tooling.
 
 ### `backend/`
 
-Java 25 LTS + Spring Boot + Maven.
+Java 21 LTS + Spring Boot + Maven (поточна конфігурація `backend/pom.xml`).
 
 - **Web/API layer:** REST controllers, DTO, validation, error responses.
 - **Application layer:** use cases розпізнавання, каталогу, тестів, історії та порівняння.

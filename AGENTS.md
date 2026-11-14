@@ -17,7 +17,7 @@ DriveSmartAI — PWA для класифікації одного дорожнь
 
 ## Якість коду
 
-- Backend: Java 25 LTS, Spring Boot, Maven; розділяти controller, use case/service, repository та infrastructure.
+- Backend: Java 21 LTS, Spring Boot, Maven; розділяти controller, use case/service, repository та infrastructure.
 - Frontend: TypeScript без `any`, React-компоненти з явними станами loading/error/empty, UI через Material UI.
 - ML: Python 3.11, PyTorch; фіксувати seed, конфігурацію, split, preprocessing і class mapping.
 - Повторно використовувати спільні типи/контракти, не дублювати preprocessing і mapping.

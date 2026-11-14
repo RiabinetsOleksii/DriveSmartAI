@@ -1,0 +1,97 @@
+"""Command-line entry points for GTSRB preparation."""
+
+import argparse
+import json
+from pathlib import Path
+
+import matplotlib.pyplot as plt
+import pandas as pd
+
+from .audit import audit_image_tree, class_counts
+from .config import DataConfig
+from .data import make_gtsrb_loaders
+from .mapping import validate_class_mapping
+from .split import records_from_training_tree, split_records, write_split_manifest
+
+
+def download_dataset(root: Path) -> None:
+    load_gtsrb(root, "train", download=True)
+    load_gtsrb(root, "test", download=True)
+    print(f"GTSRB downloaded to {root}")
+
+
+def audit_dataset(root: Path, output: Path) -> None:
+    audit = audit_image_tree(root)
+    output.mkdir(parents=True, exist_ok=True)
+    audit.to_csv(output / "image_audit.csv", index=False)
+    counts = class_counts(audit)
+    pd.DataFrame({"class_id": list(range(43)), "count": [counts.get(index, 0) for index in range(43)]}).to_csv(
+        output / "class_distribution.csv", index=False
+    )
+    plt.figure(figsize=(14, 5))
+    plt.bar(range(43), [counts.get(index, 0) for index in range(43)])
+    plt.xlabel("GTSRB class ID")
+    plt.ylabel("Image count")
+    plt.tight_layout()
+    plt.savefig(output / "class_distribution.png", dpi=150)
+    plt.close()
+    print(json.dumps({"files": len(audit), "corrupted": int(audit["error"].notna().sum()), "classes": len(counts)}))
+
+
+def smoke_check(root: Path, split_manifest: Path, image_size: int, batch_size: int, num_workers: int) -> None:
+    config = DataConfig(root=root, image_size=image_size, batch_size=batch_size, num_workers=num_workers)
+    loaders = make_gtsrb_loaders(config, split_manifest)
+    batch, labels = next(iter(loaders["train"]))
+    if tuple(batch.shape[1:]) != (3, image_size, image_size):
+        raise RuntimeError(f"unexpected tensor shape: {tuple(batch.shape)}")
+    if not 0 <= int(labels.min()) or int(labels.max()) > 42:
+        raise RuntimeError("labels are outside 0..42")
+    if not batch.isfinite().all():
+        raise RuntimeError("batch contains NaN or Inf")
+    print(
+        f"Smoke check passed: train={len(loaders['train'].dataset)}, "
+        f"validation={len(loaders['validation'].dataset)}, test={len(loaders['test'].dataset)}, "
+        f"batch={tuple(batch.shape)}, labels={int(labels.min())}..{int(labels.max())}"
+    )
+
+
+def create_split(root: Path, output: Path, validation_fraction: float, seed: int) -> None:
+    records = records_from_training_tree(root)
+    train, validation = split_records(records, validation_fraction=validation_fraction, seed=seed)
+    write_split_manifest(train, validation, output, seed=seed, validation_fraction=validation_fraction)
+    print(f"Split manifest written to {output}")
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    subparsers = parser.add_subparsers(dest="command", required=True)
+    download = subparsers.add_parser("download")
+    download.add_argument("--root", type=Path, default=Path("..") / "datasets" / "gtsrb")
+    audit = subparsers.add_parser("audit")
+    audit.add_argument("--root", type=Path, default=Path("..") / "datasets" / "gtsrb")
+    audit.add_argument("--output", type=Path, default=Path("outputs") / "audit")
+    smoke = subparsers.add_parser("smoke")
+    smoke.add_argument("--root", type=Path, default=Path("..") / "datasets" / "gtsrb")
+    smoke.add_argument("--image-size", type=int, default=64)
+    smoke.add_argument("--batch-size", type=int, default=8)
+    smoke.add_argument("--num-workers", type=int, default=0)
+    smoke.add_argument("--split-manifest", type=Path, default=Path("outputs") / "split.csv")
+    split = subparsers.add_parser("split")
+    split.add_argument("--root", type=Path, default=Path("..") / "datasets" / "gtsrb")
+    split.add_argument("--output", type=Path, default=Path("outputs") / "split.csv")
+    split.add_argument("--validation-fraction", type=float, default=0.2)
+    split.add_argument("--seed", type=int, default=42)
+    args = parser.parse_args()
+    validate_class_mapping()
+    if args.command == "download":
+        download_dataset(args.root)
+    elif args.command == "audit":
+        audit_dataset(args.root, args.output)
+    elif args.command == "smoke":
+        smoke_check(args.root, args.split_manifest, args.image_size, args.batch_size, args.num_workers)
+    else:
+        create_split(args.root, args.output, args.validation_fraction, args.seed)
+
+
+if __name__ == "__main__":
+    main()

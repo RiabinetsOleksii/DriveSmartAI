@@ -1,0 +1,15 @@
+{
+  "version": "1.0",
+  "color": "RGB",
+  "image_size": [64, 64],
+  "resize_interpolation": "bilinear",
+  "tensor_layout": "NCHW",
+  "normalization": {
+    "scale": "pixel / 255.0",
+    "mean": [0.485, 0.456, 0.406],
+    "std": [0.229, 0.224, 0.225]
+  },
+  "training_only_augmentations": ["small_rotation", "small_translation", "brightness_contrast"],
+  "forbidden_augmentations": ["horizontal_flip"],
+  "class_id_range": [0, 42]
+}
