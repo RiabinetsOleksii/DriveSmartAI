@@ -59,16 +59,17 @@
 
 - [x] Створити React + TypeScript + Vite skeleton.
 - [x] Налаштувати Material UI theme та responsive layout.
-- [x] Реалізувати upload flow і client-side validation.
-- [ ] Реалізувати result, catalog, tests, history, progress і comparison pages.
+- [x] Реалізувати upload flow і client-side validation для JPEG/PNG до 5 МБ.
+- [x] Реалізувати сторінку розпізнавання з preview, loading/error/success states і top-3.
+- [ ] Реалізувати catalog, tests, history, progress і comparison pages.
 - [ ] Додати auth flow і стани loading/error/empty.
 - [ ] Додати manifest, service worker та installability checks.
-- [ ] Додати component та integration tests.
+- [-] Додати component та integration tests для розпізнавання.
 
 ## Етап 7. Інтеграція та якість
 
-- [ ] Перевірити повний сценарій: photo → API → ONNX → result.
-- [ ] Перевірити помилки великих/невалідних/пошкоджених файлів.
+- [-] Перевірити повний сценарій: photo → API → ONNX → result.
+- [x] Перевірити помилки великих/невалідних файлів у Frontend.
 - [ ] Перевірити ізоляцію історії та прогресу різних користувачів.
 - [ ] Перевірити доступність клавіатурою та mobile layout.
 - [ ] Додати performance smoke test для inference.

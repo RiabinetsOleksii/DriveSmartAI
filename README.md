@@ -107,6 +107,53 @@ $env:DRIVESMART_ONNX_MODEL_SHA256 = "<SHA-256 ONNX-моделі>"
 curl.exe -s -F "file=@src\test\resources\gtsrb-00000.png;type=image/png" http://localhost:8080/api/predict
 ```
 
+## Запуск Frontend
+
+Команди виконуються з кореня репозиторію:
+
+```powershell
+Set-Location .\frontend
+npm install
+npm run dev
+```
+
+Frontend доступний на `http://localhost:5173`. Vite проксує запити `/api`
+до Spring Boot на `http://localhost:8080`, тому окремі налаштування CORS не потрібні.
+
+## Використання розпізнавання
+
+1. Запустіть Backend і Frontend.
+2. Відкрийте `http://localhost:5173/recognition`.
+3. Перетягніть JPEG або PNG-файл у зону завантаження або натисніть її для вибору файла.
+4. Підтвердіть назву та розмір файла, натисніть «Розпізнати знак».
+5. На екрані з’являться назва класу, confidence, ID класу та top-3 передбачення.
+
+Підтримуються лише JPEG і PNG розміром до 5 МБ включно. Модель призначена для
+класифікації одного дорожнього знака на зображенні.
+
+## Перевірка всієї системи
+
+Запустіть Backend у першому вікні PowerShell:
+
+```powershell
+Set-Location C:\Projects\DriveSmartAI\backend
+.\mvnw.cmd spring-boot:run
+```
+
+Запустіть Frontend у другому вікні:
+
+```powershell
+Set-Location C:\Projects\DriveSmartAI\frontend
+npm run dev
+```
+
+Перевірте health і реальне розпізнавання тестового зображення:
+
+```powershell
+Invoke-RestMethod -Uri "http://localhost:8080/api/health" -Method Get
+curl.exe -s -F "file=@C:\Projects\DriveSmartAI\backend\src\test\resources\gtsrb-00000.png;type=image/png" http://localhost:8080/api/predict
+```
+
 ## Принципи
 
 - ML-результати публікуються лише після реального відтворюваного експерименту.

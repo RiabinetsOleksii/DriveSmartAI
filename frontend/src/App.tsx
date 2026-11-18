@@ -22,6 +22,7 @@ import {
 } from '@mui/material'
 import { ThemeProvider, createTheme } from '@mui/material/styles'
 import { getHealthStatus } from './api/health'
+import RecognitionPage from './RecognitionPage'
 import './App.css'
 
 const navigation = [
@@ -170,42 +171,6 @@ function BackendStatus({ status }: { status: 'loading' | 'online' | 'offline' })
 
 function FeatureCard({ icon, title, text }: { icon: string; title: string; text: string }) {
   return <Card variant="outlined" sx={{ flex: 1, borderColor: 'transparent', boxShadow: '0 8px 30px rgba(31, 41, 55, 0.06)' }}><CardContent sx={{ p: 3 }}><Box sx={{ color: 'primary.main', mb: 2 }}>{icon}</Box><Typography variant="h6" gutterBottom>{title}</Typography><Typography color="text.secondary">{text}</Typography></CardContent></Card>
-}
-
-function RecognitionPage() {
-  const [file, setFile] = useState<File | null>(null)
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
-  const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => () => { if (previewUrl) URL.revokeObjectURL(previewUrl) }, [previewUrl])
-
-  const handleFile = (selectedFile: File | undefined) => {
-    if (!selectedFile) return
-    if (!selectedFile.type.startsWith('image/')) {
-      setError('Будь ласка, оберіть файл зображення.')
-      return
-    }
-    if (selectedFile.size > 10 * 1024 * 1024) {
-      setError('Розмір зображення не може перевищувати 10 МБ.')
-      return
-    }
-    if (previewUrl) URL.revokeObjectURL(previewUrl)
-    setFile(selectedFile)
-    setPreviewUrl(URL.createObjectURL(selectedFile))
-    setError(null)
-  }
-
-  return <Container maxWidth="md" sx={{ py: { xs: 5, md: 9 } }}>
-    <Stack spacing={1} sx={{ mb: 4 }}><Typography variant="h2">Розпізнавання</Typography><Typography color="text.secondary">Завантажте фото одного дорожнього знака для підготовки до аналізу.</Typography></Stack>
-    <Card variant="outlined"><CardContent sx={{ p: { xs: 2, md: 4 } }}>
-      <Stack spacing={3} sx={{ alignItems: 'center' }}>
-        <Button component="label" variant="contained" size="large">Обрати фотографію<input hidden type="file" accept="image/*" onChange={(event) => handleFile(event.target.files?.[0])} /></Button>
-        <Typography variant="body2" color="text.secondary">PNG, JPEG або WEBP до 10 МБ</Typography>
-        {error && <Alert severity="error" sx={{ width: '100%' }}>{error}</Alert>}
-        {previewUrl && file && <Box sx={{ width: '100%', textAlign: 'center' }}><Box component="img" src={previewUrl} alt={`Попередній перегляд: ${file.name}`} sx={{ maxWidth: '100%', maxHeight: 420, borderRadius: 2, objectFit: 'contain' }} /><Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>{file.name}</Typography><Alert severity="info" sx={{ mt: 3, textAlign: 'left' }}>Реальне розпізнавання буде доступне після підключення ML-моделі.</Alert></Box>}
-      </Stack>
-    </CardContent></Card>
-  </Container>
 }
 
 function PlaceholderPage({ title, description }: { title: string; description: string }) {
