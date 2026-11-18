@@ -79,6 +79,34 @@ py -3.11 -m pytest
 py -3.11 -m drivesmart_ml.cli export-cnn-onnx --checkpoint outputs\custom-cnn\best_cnn.pth --output outputs\custom-cnn\best_cnn.onnx --parity-tensors 4 --seed 42
 ```
 
+## Запуск Backend із ONNX inference
+
+Команди виконуються з `C:\Projects\DriveSmartAI\backend`:
+
+```powershell
+.\mvnw.cmd test
+.\mvnw.cmd spring-boot:run
+Invoke-RestMethod -Uri "http://localhost:8080/api/health" -Method Get
+```
+
+Застосунок завантажує ONNX-модель один раз при старті. За замовчуванням
+використовується локальний шлях
+`..\ml-training\outputs\custom-cnn\best_cnn.onnx`.
+
+Для іншого розташування можна задати environment variable:
+
+```powershell
+$env:DRIVESMART_ONNX_MODEL_PATH = "C:\models\drivesmart\best_cnn.onnx"
+$env:DRIVESMART_ONNX_MODEL_SHA256 = "<SHA-256 ONNX-моделі>"
+.\mvnw.cmd spring-boot:run
+```
+
+Перевірка розпізнавання локального GTSRB-зображення:
+
+```powershell
+curl.exe -s -F "file=@src\test\resources\gtsrb-00000.png;type=image/png" http://localhost:8080/api/predict
+```
+
 ## Принципи
 
 - ML-результати публікуються лише після реального відтворюваного експерименту.

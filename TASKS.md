@@ -45,6 +45,8 @@
 ## Етап 5. Backend
 
 - [x] Створити Spring Boot/Maven skeleton на Java 21 LTS.
+- [x] Додати ONNX Runtime Java CPU inference для Custom CNN.
+- [x] Реалізувати `POST /api/predict` із валідацією зображень і top-3.
 - [ ] Додати конфігурацію профілів і секретів без hardcode.
 - [ ] Реалізувати ONNX Runtime adapter і model registry.
 - [ ] Реалізувати `POST /api/v1/recognitions` з валідацією.
