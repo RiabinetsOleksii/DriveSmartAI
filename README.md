@@ -54,9 +54,10 @@ YOLO, відео та детекція кількох знаків не вход
 
 ## Поточний стан
 
-Реалізовано мінімальний Spring Boot backend із `GET /api/health`, React + TypeScript frontend skeleton із health API integration та ML-модуль підготовки даних GTSRB. MySQL, OAuth, навчання моделей, ONNX і результати експериментів ще не реалізовані.
+Реалізовано мінімальний Spring Boot backend із `GET /api/health`, React + TypeScript frontend skeleton із health API integration та ML-модуль підготовки і навчання GTSRB.
 
-Наступний крок — локально завантажити GTSRB, виконати аудит і smoke-check DataLoader, після чого перейти до навчання власної CNN.
+Для фінального checkpoint Custom CNN додано ONNX-експорт, ONNX Runtime parity-перевірку
+CPU та JSON metadata для майбутнього Java inference. Backend і Frontend у цей етап не змінювалися.
 
 ## Документація
 
@@ -64,6 +65,19 @@ YOLO, відео та детекція кількох знаків не вход
 - [Архітектура та API](./ARCHITECTURE.md)
 - [План робіт](./TASKS.md)
 - [Правила для AI-агента та розробників](./AGENTS.md)
+- [Інструкції ML-модуля](./ml-training/README.md)
+
+## Експорт фінальної Custom CNN
+
+Команди виконуються в PowerShell із кореня репозиторію:
+
+```powershell
+py -3.11 -m pip install -r ml-training\requirements.txt
+py -3.11 -m pip install -e .\ml-training
+Set-Location .\ml-training
+py -3.11 -m pytest
+py -3.11 -m drivesmart_ml.cli export-cnn-onnx --checkpoint outputs\custom-cnn\best_cnn.pth --output outputs\custom-cnn\best_cnn.onnx --parity-tensors 4 --seed 42
+```
 
 ## Принципи
 

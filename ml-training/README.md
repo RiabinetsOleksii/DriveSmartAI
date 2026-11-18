@@ -89,3 +89,32 @@ python -m drivesmart_ml.cli evaluate-models --root ..\datasets\gtsrb --custom-ch
 
 Команда створює aggregate/per-class metrics, CSV/JSON comparison,
 confusion matrix CSV/PNG і вимірювання GPU inference latency.
+
+## Експорт Custom CNN у ONNX
+
+Після встановлення залежностей експорт і перевірка виконуються з
+`C:\Projects\DriveSmartAI\ml-training`:
+
+```powershell
+py -3.11 -m pip install -r requirements.txt
+py -3.11 -m pip install -e .
+py -3.11 -m drivesmart_ml.cli export-cnn-onnx --checkpoint outputs\custom-cnn\best_cnn.pth --output outputs\custom-cnn\best_cnn.onnx --parity-tensors 4 --seed 42
+```
+
+Команда перевіряє checksum/checkpoint architecture, експортує динамічну batch
+вісь, перевіряє ONNX model/shape та порівнює PyTorch і ONNX Runtime CPU inference
+на детермінованих тестових тензорах.
+
+Створюються:
+
+- `outputs/custom-cnn/best_cnn.onnx` — модель із входом `[batch, 3, 64, 64]`
+  і виходом `[batch, 43]`;
+- `outputs/custom-cnn/best_cnn_metadata.json` — preprocessing, class mapping,
+  імена tensor-ів, opset, checksum-и та parity;
+- `outputs/custom-cnn/best_cnn_parity.json` — числове порівняння PyTorch/ONNX.
+
+Автоматична перевірка ONNX включена в unit-тести:
+
+```powershell
+py -3.11 -m pytest
+```

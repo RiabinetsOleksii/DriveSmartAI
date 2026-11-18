@@ -15,6 +15,7 @@ from .split import records_from_training_tree, split_records, write_split_manife
 from .mobilenet_training import train_mobilenet
 from .training import train
 from .evaluation import evaluate_models
+from .onnx_export import export_custom_cnn
 
 
 def download_dataset(root: Path) -> None:
@@ -118,6 +119,19 @@ def main() -> None:
     evaluate_parser.add_argument("--batch-size", type=int, default=8)
     evaluate_parser.add_argument("--num-workers", type=int, default=0)
     evaluate_parser.add_argument("--warmup-batches", type=int, default=2)
+    export_parser = subparsers.add_parser("export-cnn-onnx")
+    export_parser.add_argument(
+        "--checkpoint",
+        type=Path,
+        default=Path("outputs") / "custom-cnn" / "best_cnn.pth",
+    )
+    export_parser.add_argument(
+        "--output",
+        type=Path,
+        default=Path("outputs") / "custom-cnn" / "best_cnn.onnx",
+    )
+    export_parser.add_argument("--parity-tensors", type=int, default=4)
+    export_parser.add_argument("--seed", type=int, default=42)
     args = parser.parse_args()
     validate_class_mapping()
     if args.command == "download":
@@ -163,6 +177,19 @@ def main() -> None:
             f"parameters={sum(parameter.numel() for parameter in model.parameters())}, "
             f"validation_accuracy={last.validation_accuracy:.4f}, "
             f"validation_macro_f1={last.validation_macro_f1:.4f}"
+        )
+    elif args.command == "export-cnn-onnx":
+        result = export_custom_cnn(
+            args.checkpoint,
+            args.output,
+            parity_tensors=args.parity_tensors,
+            seed=args.seed,
+        )
+        print(
+            f"ONNX export complete: {args.output}, "
+            f"input={result['input_shape']}, output={result['output_shape']}, "
+            f"max_abs_diff={result['comparison']['max_abs_diff']:.9f}, "
+            f"top1_match={result['comparison']['top1_match']}"
         )
     else:
         result = evaluate_models(

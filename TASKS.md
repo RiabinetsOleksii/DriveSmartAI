@@ -36,9 +36,10 @@
 
 ## Етап 4. ONNX та inference contract
 
-- [ ] Експортувати обидві затверджені моделі в ONNX.
-- [ ] Додати parity-перевірку PyTorch проти ONNX Runtime.
-- [ ] Описати input shape, normalization, labels і output semantics.
+- [x] Експортувати затверджену Custom CNN у ONNX.
+- [ ] Експортувати затверджену MobileNetV3 у ONNX.
+- [x] Додати parity-перевірку PyTorch Custom CNN проти ONNX Runtime.
+- [x] Описати input shape, normalization, labels і output semantics для Custom CNN.
 - [ ] Перевірити checksum та version metadata.
 
 ## Етап 5. Backend
